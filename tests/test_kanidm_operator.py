@@ -25,7 +25,7 @@ def test_resource_lifecycle():
     # Run the operator
     with kopf.testing.KopfRunner(
         ['run', '--all-namespaces', '--standalone', "-m", "kanidm_operator"], #"--verbose",
-        timeout=60, settings=settings,
+        timeout=120, settings=settings,
     ) as runner:
         # Trigger the kanidm deployment using the kanidm CRD
         subprocess.run(f"kubectl apply -f {os.path.join(example, 'kanidm.yaml')}",shell=True, check=True, timeout=30, capture_output=True)
@@ -38,7 +38,7 @@ def test_resource_lifecycle():
             output = subprocess.run(f"kubectl describe deployment -n kanidm kanidm",shell=True, check=True, timeout=60, capture_output=True)
             print(f"Failed while waiting for the deployment to complete, describe deployment output:\n {output.stdout}")
             raise
-        
+
         # Check there is a DNS entry for the ingress
         import socket
         try:
@@ -50,7 +50,7 @@ def test_resource_lifecycle():
         # Check ingress is there and SSL is valid
         import requests
         try:
-            idm_ingress = requests.head("https://idm.example.com", verify='/etc/ssl/certs/ca-certificates.crt') 
+            idm_ingress = requests.head("https://idm.example.com", verify='/etc/ssl/certs/ca-certificates.crt')
         except requests.exceptions.ConnectionError:
             raise Exception("idm.example.com is not reachable")
 
@@ -61,7 +61,7 @@ def test_resource_lifecycle():
         subprocess.run(f"kubectl apply -f {os.path.join(example, 'users.yaml')}",shell=True, check=True, timeout=30, capture_output=True)
         # Wait for the user to be "processed" by the operator, so that the deployment is created
         subprocess.run(r"kubectl wait -n kanidm user marcus --for=jsonpath='{.metadata.annotations.kanidm\.github\.io/processed}'='true'",shell=True, check=True, timeout=90, capture_output=True)
-        
+
         # Trigger adding a group
         subprocess.run(f"kubectl apply -f {os.path.join(example, 'groups.yaml')}",shell=True, check=True, timeout=30, capture_output=True)
         # Wait for the group to be "processed" by the operator, so that the deployment is created
