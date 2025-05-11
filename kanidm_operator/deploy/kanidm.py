@@ -54,6 +54,7 @@ async def on_create_kanidms(
     )
     deployer.deploy(
         "server.toml",
+        version=spec["version"],
         domain=spec["domain"],
         log_level=spec.get("logLevel", "info"),
         ldap_port=spec.get("ldapPort", "3890"),
@@ -92,7 +93,7 @@ async def on_create_kanidms(
             namespace,
             label_selector="app.kubernetes.io/name=kanidm",
         ).items
-        
+
         if len(pods) == 0:
             logger.info(f"Waiting for kanidm {name} pod to be created")
             time.sleep(5)
@@ -107,7 +108,7 @@ async def on_create_kanidms(
             continue
 
         logger.info("Kanidm pod is running, trying to fetch admin and idm_admin passwords")
-        
+
         resp = stream(core.connect_get_namespaced_pod_exec,
                 pod.metadata.name,
                 namespace,
@@ -150,7 +151,7 @@ async def on_create_kanidms(
         )
         logger.info("Kanidm admin and idm_admin passwords have been fetched and stored in secrets")
         done = True
-    
+
     patch.setdefault("metadata", {}).setdefault("annotations", {})["kanidm.github.io/processed"] = "true"
 
 @kopf.on.update("kanidm.github.io", "v1alpha1", "kanidms")

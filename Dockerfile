@@ -21,10 +21,10 @@ RUN apt update && \
     rm -rf /var/lib/apt/lists/*
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-# Install the kanidm CLI tool 
+# Install the kanidm CLI tool
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
-RUN cargo install kanidm_tools@=1.2.2
+RUN cargo install kanidm_tools@=1.6.2
 
 # Get the python environment setup using poetry
 RUN pipx install poetry
@@ -35,6 +35,7 @@ RUN poetry config virtualenvs.in-project true
 COPY poetry.lock /app/poetry.lock
 COPY pyproject.toml /app/pyproject.toml
 COPY kanidm_operator /app/kanidm_operator
+COPY README.md /app/README.md
 RUN --mount=type=ssh poetry install --only=main --no-interaction --no-ansi
 
 FROM python:3.11-slim as final
@@ -53,6 +54,5 @@ ENV PATH /app/.venv/bin:/root/.cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/loc
 
 # Add -vvv after poetry to debug poetry
 ENTRYPOINT ["python3","-m", "kopf", "run"]
-# Add --verbose or even --debug to see more output from kopf 
+# Add --verbose or even --debug to see more output from kopf
 CMD [ "--liveness=http://0.0.0.0:8080/healthz", "--standalone", "--all-namespaces", "-m", "kanidm_operator"]
-

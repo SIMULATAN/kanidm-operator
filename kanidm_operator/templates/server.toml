@@ -1,6 +1,10 @@
 {% extends "configmap.yaml" %}
 {% block component %}server-config{% endblock %}
 {% block data %}
+    {% set version_array = version.split('.') | map('int') | list %}
+    {% if version_array > [6, 0, 0] %}
+    version = "2"
+    {% endif %}
     bindaddress = "0.0.0.0:{{ http_port | default(8443) }}"
     ldapbindaddress = "0.0.0.0:{{ ldap_port | default(3630) }}"
     trust_x_forward_for = {{ trust_x_forwarded_for | default(False) | lower }}

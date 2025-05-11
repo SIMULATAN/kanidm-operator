@@ -9,3 +9,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: kanidm-operator-account
+    namespace: kanidm-system
