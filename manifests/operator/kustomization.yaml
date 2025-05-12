@@ -4,9 +4,9 @@ kind: Kustomization
 
 resources:
   - service-account.yaml
-  - role.yaml
-  - cluster-role.yaml
+  - cluster-role-namespaced.yaml
   - role-binding.yaml
+  - cluster-role.yaml
   - cluster-role-binding.yaml
   - deployment.yaml
   # - rotate-tokens.cronjob.yaml
