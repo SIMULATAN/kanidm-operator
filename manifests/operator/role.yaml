@@ -10,7 +10,7 @@ rules:
 
   # Application: watching & handling for the custom resource we declare.
   - apiGroups: [kanidm.github.io]
-    resources: [accounts, groups, oauth2-clients, password-badlists, service-accounts, kanidms]
+    resources: [accounts, users, groups, oauth2-clients, password-badlists, service-accounts, kanidms]
     verbs: [list, watch, patch]
 
   # Application: other resources it produces and manipulates.
